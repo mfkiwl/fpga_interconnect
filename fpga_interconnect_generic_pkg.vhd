@@ -50,6 +50,9 @@ package fpga_interconnect_generic_pkg is
 
     function get_address ( bus_in : fpga_interconnect_record)
         return integer;
+
+    function get_slv_data ( bus_in : fpga_interconnect_record)
+        return std_logic_vector;
 ------------------------------------------------------------------------
     procedure request_data_from_address (
         signal bus_out : out fpga_interconnect_record;
@@ -214,6 +217,16 @@ package body fpga_interconnect_generic_pkg is
     begin
         return to_integer(bus_in.data);
     end get_data;
+------------------------------------------------------------------------
+    function get_slv_data
+    (
+        bus_in : fpga_interconnect_record
+    )
+    return std_logic_vector
+    is
+    begin
+        return bus_in.data;
+    end get_slv_data;
 ------------------------------------------------------------------------
     procedure request_data_from_address
     (
