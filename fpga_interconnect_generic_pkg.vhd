@@ -147,7 +147,7 @@ package body fpga_interconnect_generic_pkg is
     return std_logic_vector
     is
     begin
-        return std_logic_vector(to_unsigned(data, 16));
+        return std_logic_vector(to_unsigned(data, number_of_data_bits));
         
     end to_std_logic_vector;
 ------------------------------------------------------------------------
@@ -166,8 +166,8 @@ package body fpga_interconnect_generic_pkg is
         data : integer
     ) is
     begin
-        bus_out.address <= to_std_logic_vector(address);
-        bus_out.data    <= to_std_logic_vector(data);
+        bus_out.address <= std_logic_vector(to_unsigned(address,number_of_address_bits));
+        bus_out.data    <= std_logic_vector(to_unsigned(data,number_of_data_bits));
         bus_out.data_write_is_requested_with_0 <= '0';
     end write_data_to_address;
 
@@ -178,8 +178,15 @@ package body fpga_interconnect_generic_pkg is
         data : std_logic_vector
     ) is
     begin
-        bus_out.address <= to_std_logic_vector(address);
-        bus_out.data    <= data;
+        bus_out.address <=std_logic_vector(to_unsigned(address, number_of_address_bits));
+        for i in data'low to data'high loop
+            bus_out.data(i - data'low) <= data(i);
+        end loop;
+			--  for i in bus_out.data'range loop
+			-- 	if i < data'high then
+			-- 		bus_out.data(i) <= data(i);
+			-- 	end if;
+			-- end loop;
         bus_out.data_write_is_requested_with_0 <= '0';
     end write_data_to_address;
 ------------------------------------------------------------------------
@@ -235,7 +242,7 @@ package body fpga_interconnect_generic_pkg is
     ) is
     begin
         bus_out.data_read_is_requested_with_0 <= '0';
-        bus_out.address <= to_std_logic_vector(address);
+        bus_out.address <= std_logic_vector(to_unsigned(address,number_of_address_bits));
     end request_data_from_address;
 ------------------------------------------------------------------------
     function read_is_requested
@@ -322,11 +329,13 @@ package body fpga_interconnect_generic_pkg is
     ) is
     begin
         if write_to_address_is_requested(bus_in, address) then
-            data <= bus_in.data;
+            for i in data'range loop
+                data(i) <= bus_in.data(i - data'low);
+            end loop;
         end if;
 
         if data_is_requested_from_address(bus_in, address) then
-            write_data_to_address(bus_out, 0, data);
+            write_data_to_address(bus_out, 0, bus_in.data);
         end if;
         
     end connect_data_to_address;
