@@ -177,16 +177,13 @@ package body fpga_interconnect_generic_pkg is
         address : integer;
         data : std_logic_vector
     ) is
+        variable response : std_logic_vector(bus_out.data'range) := (others => '0');
     begin
         bus_out.address <=std_logic_vector(to_unsigned(address, number_of_address_bits));
         for i in data'low to data'high loop
-            bus_out.data(i - data'low) <= data(i);
+            response(i - data'low) := data(i);
         end loop;
-			--  for i in bus_out.data'range loop
-			-- 	if i < data'high then
-			-- 		bus_out.data(i) <= data(i);
-			-- 	end if;
-			-- end loop;
+        bus_out.data <= response;
         bus_out.data_write_is_requested_with_0 <= '0';
     end write_data_to_address;
 ------------------------------------------------------------------------
@@ -327,6 +324,7 @@ package body fpga_interconnect_generic_pkg is
         address        : in integer                   ;
         signal data    : inout std_logic_vector
     ) is
+        variable response_data : std_logic_vector(bus_out.data'range) := (others => '0');
     begin
         if write_to_address_is_requested(bus_in, address) then
             for i in data'range loop
@@ -335,7 +333,10 @@ package body fpga_interconnect_generic_pkg is
         end if;
 
         if data_is_requested_from_address(bus_in, address) then
-            write_data_to_address(bus_out, 0, bus_in.data);
+            for i in data'low to data'high loop
+                response_data(i - data'low) := data(i);
+            end loop;
+            write_data_to_address(bus_out, 0, response_data);
         end if;
         
     end connect_data_to_address;
