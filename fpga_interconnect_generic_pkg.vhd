@@ -365,7 +365,7 @@ package body fpga_interconnect_generic_pkg is
     ) is
     begin
         if data_is_requested_from_address(bus_in, address) then
-            write_data_to_address(bus_out, 0, to_integer(unsigned(data)));
+            write_data_to_address(bus_out, 0, data);
         end if;
         
     end connect_read_only_data_to_address;
