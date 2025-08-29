@@ -177,13 +177,10 @@ package body fpga_interconnect_generic_pkg is
         address : integer;
         data : std_logic_vector
     ) is
-        variable response : std_logic_vector(bus_out.data'range) := (others => '0');
+		constant response : std_logic_vector(data'length-1 downto 0) := data;
     begin
         bus_out.address <=std_logic_vector(to_unsigned(address, number_of_address_bits));
-        for i in data'low to data'high loop
-            response(i - data'low) := data(i);
-        end loop;
-        bus_out.data <= response;
+        bus_out.data <= (response'range => response, others => '0');
         bus_out.data_write_is_requested_with_0 <= '0';
     end write_data_to_address;
 ------------------------------------------------------------------------
