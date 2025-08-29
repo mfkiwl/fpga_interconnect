@@ -180,7 +180,8 @@ package body fpga_interconnect_generic_pkg is
 		constant response : std_logic_vector(data'length-1 downto 0) := data;
     begin
         bus_out.address <=std_logic_vector(to_unsigned(address, number_of_address_bits));
-        bus_out.data <= (response'range => response, others => '0');
+        bus_out.data <= (others => '0');
+        bus_out.data(response'range) <= response;
         bus_out.data_write_is_requested_with_0 <= '0';
     end write_data_to_address;
 ------------------------------------------------------------------------
